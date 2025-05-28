@@ -1,0 +1,20 @@
+# 仮想環境フォルダ
+.venv/
+venv/
+ENV/
+
+# Pythonキャッシュ
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE/エディタ設定ファイル
+.vscode/
+.idea/
+
+# 環境変数ファイル (APIキーなどを記述)
+.env
+
+# OS固有ファイル
+.DS_Store
+Thumbs.db
