@@ -2,4 +2,5 @@ notion-client
 azure-storage-blob
 google-generativeai
 langchain
-python-dotenv  # 環境変数を.envファイルから読み込むために追加
+llama-index
+python-dotenv
