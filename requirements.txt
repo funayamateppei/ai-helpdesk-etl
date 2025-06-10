@@ -1,6 +1,2 @@
 notion-client
-azure-storage-blob
-google-generativeai
-langchain
-llama-index
 python-dotenv
