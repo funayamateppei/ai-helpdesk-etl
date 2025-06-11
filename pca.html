@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>3Dプロット</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Meiryo", sans-serif;
+        background: #fff8fc;
+      }
+      #plot {
+        width: 90vw;
+        height: 80vh;
+        margin: 2em auto;
+      }
+      h1 {
+        text-align: center;
+        color: #e75480;
+      }
+      .credit {
+        text-align: center;
+        color: #aaa;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="plot"></div>
+    <script>
+      fetch("vectorized_chunks_3d.json")
+        .then((res) => res.json())
+        .then((data) => {
+          const x = data.map((d) => d.x)
+          const y = data.map((d) => d.y)
+          const z = data.map((d) => d.z)
+          const texts = data.map((d) => `<b>内容:</b><br>${d.chunk.replace(/\n/g, "<br>")}<br><a href='${d.url}' target='_blank'>Notionリンク</a>`)
+          const trace = {
+            x,
+            y,
+            z,
+            mode: "markers",
+            type: "scatter3d",
+            marker: {
+              size: 8,
+              color: x.map((_, i) => i),
+              colorscale: "Rainbow",
+              opacity: 0.85,
+              line: { width: 1, color: "#fff" },
+            },
+            text: texts,
+            hoverinfo: "text",
+          }
+          const layout = {
+            margin: { l: 0, r: 0, b: 0, t: 0 },
+            scene: {
+              xaxis: { title: "主成分1" },
+              yaxis: { title: "主成分2" },
+              zaxis: { title: "主成分3" },
+            },
+            hoverlabel: { bgcolor: "#fff0fa", font: { color: "#e75480" } },
+          }
+          Plotly.newPlot("plot", [trace], layout)
+        })
+    </script>
+  </body>
+</html>
