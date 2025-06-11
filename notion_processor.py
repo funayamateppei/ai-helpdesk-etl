@@ -12,8 +12,8 @@ if not PAGE_ID:
 
 # Notionから全ページを再帰的に取得
 all_pages = get_all_pages_recursive(PAGE_ID)
-if not all_pages:
-    print("NotFound: No pages found in the specified Notion page.")
-    exit()
+# ページごとにテキストをチャンク分割
+all_chunks = split_all_pages(all_pages)
+print(f"取得したチャンク数: {len(all_chunks)}")
 
 exit()
