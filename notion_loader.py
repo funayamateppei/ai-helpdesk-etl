@@ -39,17 +39,9 @@ def extract_text_from_block(block):
             for caption_item in caption_array:
                 text += caption_item.get("plain_text", "")
             text += "\n"
-    elif block_type in ["file", "pdf", "image"]:
-        file_info = block.get(block_type, {})
-        file_url = file_info.get("file", {}).get("url") or file_info.get("external", {}).get("url")
-        file_name = file_info.get("name", "ファイル名不明")
-        text += f"[{block_type.upper()}] {file_name}: {file_url}\n"
-        caption_array = file_info.get("caption", [])
-        if caption_array:
-            text += "キャプション: "
-            for caption_item in caption_array:
-                text += caption_item.get("plain_text", "")
-            text += "\n"
+    # image, file, pdfは無視する！
+    # elif block_type in ["file", "pdf", "image"]:
+    #     ...（何もしない）
     return text
 
 def get_child_page_ids(page_id):
