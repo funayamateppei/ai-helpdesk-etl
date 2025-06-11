@@ -18,3 +18,5 @@ __pycache__/
 # OS固有ファイル
 .DS_Store
 Thumbs.db
+
+*.json
