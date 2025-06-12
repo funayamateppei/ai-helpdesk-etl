@@ -24,6 +24,11 @@ Notion 連携 AI ナレッジ Q&A ボット
 
 ### 1. セットアップ
 
+- venv で仮想環境を作成＆有効化
+  ```zsh
+  python3 -m venv .venv
+  source .venv/bin/activate
+  ```
 - 必要なパッケージをインストール
   ```zsh
   pip install -r requirements.txt
@@ -39,7 +44,7 @@ Notion 連携 AI ナレッジ Q&A ボット
 
 - Notion から全ページ取得＆チャンク分割・ベクトル化
   ```zsh
-  python3 notion_processor.py
+  python notion_processor.py
   ```
 - `vectorized_chunks.json`に保存される
 
@@ -47,7 +52,7 @@ Notion 連携 AI ナレッジ Q&A ボット
 
 - 質問を入力して AI Q&A
   ```zsh
-  python3 qa_bot.py
+  python qa_bot.py
   ```
 - 質問 embedding は`question_vectors.json`に保存
 
@@ -55,7 +60,7 @@ Notion 連携 AI ナレッジ Q&A ボット
 
 - ベクトルを PCA で 3 次元化＆Plotly.js で可視化
   ```zsh
-  python3 pca_vectorize.py
+  python pca_vectorize.py
   open pca.html
   ```
 - `pca.html`でナレッジ分布＆質問位置を 3D 表示
@@ -63,4 +68,4 @@ Notion 連携 AI ナレッジ Q&A ボット
 ## 注意
 
 - Notion の親ページは自動で除外される
-- Gemini リクエスト上限に注意
+- Gemini はリクエスト上限に注意
