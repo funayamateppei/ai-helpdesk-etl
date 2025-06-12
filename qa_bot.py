@@ -4,6 +4,8 @@ import os
 from typing import List
 import google.generativeai as genai
 from dotenv import load_dotenv
+from text_normalizer import get_gemini_embedding
+from sklearn.decomposition import PCA
 
 # --- .envからAPIキーを読み込む ---
 load_dotenv()
@@ -20,17 +22,7 @@ def cosine_similarity(a: List[float], b: List[float]) -> float:
 
 def get_embedding(text: str) -> List[float]:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    genai.configure(api_key=GEMINI_API_KEY)
-    try:
-        response = genai.embed_content(
-            model="models/text-embedding-004",
-            content=text,
-            task_type="retrieval_query"
-        )
-        return response["embedding"]
-    except Exception as e:
-        print(f"Gemini embedding取得エラー: {e}")
-        return None
+    return get_gemini_embedding(text, GEMINI_API_KEY, task_type="retrieval_document")
 
 def find_most_similar(query_emb: List[float], chunks: List[dict]):
     sims = [cosine_similarity(query_emb, c["embedding"]) for c in chunks]
@@ -53,25 +45,28 @@ def ask_llm(context: str, question: str) -> str:
     return response.text.strip()
 
 def save_question_vector(question: str, embedding: list, path: str = "question_vectors.json"):
-    from sklearn.decomposition import PCA
-    # 1件だけのデータを作成
-    data = {
+    # ドキュメントのembeddingを全部読み込む
+    with open("vectorized_chunks.json", encoding="utf-8") as f:
+        doc_data = json.load(f)
+    all_embeddings = [item["embedding"] for item in doc_data] + [embedding]
+    pca = PCA(n_components=3)
+    reduced = pca.fit_transform(all_embeddings)
+    # 質問は最後
+    qx, qy, qz = reduced[-1][0], reduced[-1][1], reduced[-1][2]
+    output = {
+        'question': question,
+        'x': float(qx),
+        'y': float(qy),
+        'z': float(qz)
+    }
+    with open('question_vectors_3d.json', 'w', encoding='utf-8') as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+    data_q = {
         "question": question,
         "embedding": embedding
     }
-    # PCAで3次元化（1件ならゼロ埋め）
-    reduced = [0, 0, 0]
-    output = {
-        "question": question,
-        "x": float(reduced[0]),
-        "y": float(reduced[1]),
-        "z": float(reduced[2])
-    }
-    with open("question_vectors_3d.json", "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
-    # 元データも上書き保存
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(data_q, f, ensure_ascii=False, indent=2)
 
 def main():
     print("質問をどうぞ (Ctrl+Cで終了)")

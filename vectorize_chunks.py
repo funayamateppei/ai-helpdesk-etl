@@ -1,26 +1,16 @@
 import os
-import google.generativeai as genai
+from text_normalizer import get_gemini_embedding
 
-def get_gemini_embedding(text):
+def get_gemini_embedding_for_chunk(text):
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    genai.configure(api_key=GEMINI_API_KEY)
-    try:
-        response = genai.embed_content(
-            model="models/text-embedding-004",
-            content=text,
-            task_type="retrieval_document"
-        )
-        return response["embedding"]
-    except Exception as e:
-        print(f"Gemini embedding取得エラー: {e}")
-        return None
+    return get_gemini_embedding(text, GEMINI_API_KEY, task_type="retrieval_document")
 
 def vectorize_chunks(all_chunks):
     vectorized_chunks = []
     for i, chunk_info in enumerate(all_chunks):
         text = chunk_info["chunk"]
         url = chunk_info["url"]
-        embedding = get_gemini_embedding(text)
+        embedding = get_gemini_embedding_for_chunk(text)
         if embedding:
             vectorized_chunks.append({
                 "chunk": text,
