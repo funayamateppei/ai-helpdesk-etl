@@ -55,17 +55,28 @@ def ask_llm(context: str, question: str) -> str:
     return response.text.strip()
 
 def save_question_vector(question: str, embedding: list, path: str = "question_vectors.json"):
-    import os
-    import json
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    else:
-        data = []
-    data.append({
+    from sklearn.decomposition import PCA
+    # 1件だけのデータを作成
+    data = [{
         "question": question,
         "embedding": embedding
-    })
+    }]
+    # PCAで3次元化（1件ならゼロ埋め）
+    if len(data) >= 3:
+        embeddings = [item["embedding"] for item in data]
+        pca = PCA(n_components=3)
+        reduced = pca.fit_transform(embeddings)
+    else:
+        reduced = [[0,0,0]]
+    output = [{
+        "question": question,
+        "x": float(reduced[0][0]),
+        "y": float(reduced[0][1]),
+        "z": float(reduced[0][2])
+    }]
+    with open("question_vectors_3d.json", "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+    # 元データも上書き保存
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 

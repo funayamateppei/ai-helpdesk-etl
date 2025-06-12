@@ -43,24 +43,53 @@
             type: "scatter3d",
             marker: {
               size: 8,
-              color: x.map((_, i) => i),
+              color: "#sss",
               colorscale: "Rainbow",
               opacity: 0.85,
               line: { width: 1, color: "#fff" },
             },
             text: texts,
             hoverinfo: "text",
+            name: "Notionチャンク",
           }
-          const layout = {
-            margin: { l: 0, r: 0, b: 0, t: 0 },
-            scene: {
-              xaxis: { title: "主成分1" },
-              yaxis: { title: "主成分2" },
-              zaxis: { title: "主成分3" },
-            },
-            hoverlabel: { bgcolor: "#fff0fa", font: { color: "#e75480" } },
-          }
-          Plotly.newPlot("plot", [trace], layout)
+
+          fetch("question_vectors_3d.json")
+            .then((res) => res.json())
+            .then((qdata) => {
+              if (qdata.length > 0) {
+                const q = qdata[0]
+                const qtrace = {
+                  x: [q.x],
+                  y: [q.y],
+                  z: [q.z],
+                  mode: "markers",
+                  type: "scatter3d",
+                  marker: {
+                    size: 6,
+                    color: "#e75480",
+                    symbol: "circle",
+                    opacity: 0.4,
+                    line: { width: 3, color: "#fff" },
+                  },
+                  text: [`<b>質問:</b><br>${q.question.replace(/\n/g, "<br>")}`],
+                  hoverinfo: "text",
+                  name: "質問",
+                }
+                const layout = {
+                  margin: { l: 0, r: 0, b: 0, t: 0 },
+                  scene: {
+                    xaxis: { title: "主成分1" },
+                    yaxis: { title: "主成分2" },
+                    zaxis: { title: "主成分3" },
+                  },
+                  hoverlabel: { bgcolor: "#fff0fa", font: { color: "#e75480" } },
+                  legend: { x: 0.01, y: 0.99 },
+                }
+                Plotly.newPlot("plot", [trace, qtrace], layout)
+              } else {
+                Plotly.newPlot("plot", [trace])
+              }
+            })
         })
     </script>
   </body>
