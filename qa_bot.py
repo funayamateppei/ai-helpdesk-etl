@@ -61,12 +61,6 @@ def save_question_vector(question: str, embedding: list, path: str = "question_v
     }
     with open('question_vectors_3d.json', 'w', encoding='utf-8') as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
-    data_q = {
-        "question": question,
-        "embedding": embedding
-    }
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data_q, f, ensure_ascii=False, indent=2)
 
 def main():
     print("質問をどうぞ (Ctrl+Cで終了)")
