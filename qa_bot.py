@@ -10,7 +10,7 @@ load_dotenv()
 
 # --- 設定 ---
 VECTOR_FILE = "vectorized_chunks.json"
-SIM_THRESHOLD = 0.5
+SIM_THRESHOLD = 0.7
 
 # --- ユーティリティ ---
 def cosine_similarity(a: List[float], b: List[float]) -> float:
@@ -20,9 +20,6 @@ def cosine_similarity(a: List[float], b: List[float]) -> float:
 
 def get_embedding(text: str) -> List[float]:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    if not GEMINI_API_KEY or GEMINI_API_KEY.strip() == "":
-        print("[致命的エラー] GEMINI_API_KEYが設定されていません！.envや環境変数を確認してね！")
-        exit(1)
     genai.configure(api_key=GEMINI_API_KEY)
     try:
         response = genai.embed_content(
@@ -37,6 +34,7 @@ def get_embedding(text: str) -> List[float]:
 
 def find_most_similar(query_emb: List[float], chunks: List[dict]):
     sims = [cosine_similarity(query_emb, c["embedding"]) for c in chunks]
+    print(f"類似度スコア: {sims}")
     max_idx = int(np.argmax(sims))
     return chunks[max_idx], sims[max_idx]
 
@@ -57,23 +55,18 @@ def ask_llm(context: str, question: str) -> str:
 def save_question_vector(question: str, embedding: list, path: str = "question_vectors.json"):
     from sklearn.decomposition import PCA
     # 1件だけのデータを作成
-    data = [{
+    data = {
         "question": question,
         "embedding": embedding
-    }]
+    }
     # PCAで3次元化（1件ならゼロ埋め）
-    if len(data) >= 3:
-        embeddings = [item["embedding"] for item in data]
-        pca = PCA(n_components=3)
-        reduced = pca.fit_transform(embeddings)
-    else:
-        reduced = [[0,0,0]]
-    output = [{
+    reduced = [0, 0, 0]
+    output = {
         "question": question,
-        "x": float(reduced[0][0]),
-        "y": float(reduced[0][1]),
-        "z": float(reduced[0][2])
-    }]
+        "x": float(reduced[0]),
+        "y": float(reduced[1]),
+        "z": float(reduced[2])
+    }
     with open("question_vectors_3d.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
     # 元データも上書き保存

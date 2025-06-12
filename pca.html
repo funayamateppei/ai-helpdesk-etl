@@ -56,8 +56,8 @@
           fetch("question_vectors_3d.json")
             .then((res) => res.json())
             .then((qdata) => {
-              if (qdata.length > 0) {
-                const q = qdata[0]
+              if (qdata && Object.keys(qdata).length > 0 && qdata.x !== undefined) {
+                const q = qdata
                 const qtrace = {
                   x: [q.x],
                   y: [q.y],
@@ -87,8 +87,33 @@
                 }
                 Plotly.newPlot("plot", [trace, qtrace], layout)
               } else {
-                Plotly.newPlot("plot", [trace])
+                // 質問データがない場合もプロット
+                const layout = {
+                  margin: { l: 0, r: 0, b: 0, t: 0 },
+                  scene: {
+                    xaxis: { title: "主成分1" },
+                    yaxis: { title: "主成分2" },
+                    zaxis: { title: "主成分3" },
+                  },
+                  hoverlabel: { bgcolor: "#fff0fa", font: { color: "#e75480" } },
+                  legend: { x: 0.01, y: 0.99 },
+                }
+                Plotly.newPlot("plot", [trace], layout)
               }
+            })
+            .catch(() => {
+              // ファイルが存在しない・読み込めない場合もNotionチャンクだけ表示
+              const layout = {
+                margin: { l: 0, r: 0, b: 0, t: 0 },
+                scene: {
+                  xaxis: { title: "主成分1" },
+                  yaxis: { title: "主成分2" },
+                  zaxis: { title: "主成分3" },
+                },
+                hoverlabel: { bgcolor: "#fff0fa", font: { color: "#e75480" } },
+                legend: { x: 0.01, y: 0.99 },
+              }
+              Plotly.newPlot("plot", [trace], layout)
             })
         })
     </script>
