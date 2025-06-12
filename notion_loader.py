@@ -90,7 +90,7 @@ def get_page_text(page_id):
         print(f"ページテキスト取得エラー: {e}")
     return text.strip()
 
-def get_all_pages_recursive(page_id, depth=0, max_depth=None):
+def get_all_pages_recursive(page_id, depth=0, max_depth=None, ignore_root=False):
     page_title, page_url = get_page_info(page_id)
     page_text = get_page_text(page_id)
     child_ids = get_child_page_ids(page_id)
@@ -101,7 +101,7 @@ def get_all_pages_recursive(page_id, depth=0, max_depth=None):
         "text": page_text,
         "children": child_ids
     }
-    all_pages = [page_data]
+    all_pages = [] if (ignore_root and depth == 0) else [page_data]
     for child_id in child_ids:
-        all_pages.extend(get_all_pages_recursive(child_id, depth=depth+1, max_depth=max_depth))
+        all_pages.extend(get_all_pages_recursive(child_id, depth=depth+1, max_depth=max_depth, ignore_root=False))
     return all_pages
